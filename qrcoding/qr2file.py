@@ -40,8 +40,24 @@ for each in lines:
 
 for adler32 in groups:
     dataset = groups[adler32]
-    gotkeys = dataset.keys().sort()
+    gotkeys = dataset.keys()
     if not gotkeys:
         continue
     if max(gotkeys) != len(gotkeys) - 1:
         print "Not all QR-Codes scanned in for file [%s]. More data needed." % adler32
+
+    origdata = "".join([dataset[i] for i in sorted(dataset.keys())])
+    controlbyte = ord(origdata[0])
+    data = origdata[1:]
+
+    check_adler32 = hex(abs(zlib.adler32(data)))[2:].decode('hex').encode('base64').replace('\n','').rstrip('=')
+    if check_adler32 == adler32:
+        compressed = controlbyte & (1 << 0)
+        
+        if compressed:
+            product = zlib.decompress(data)
+        
+        print product
+
+    else:
+        print "ONE FILE FAILED READ."
