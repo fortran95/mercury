@@ -30,13 +30,16 @@ groups = {}
 for each in lines:
     if not each.startswith('QR-Code:'):
         continue
-    each = each[8:]
+    each = each[8:].strip()
     adler32 = each[0:6]
     seqid = int('0x' + each[6:8],16)
     if not groups.has_key(adler32):
         groups[adler32] = {}
     eachdata = each[8:] + '=' * (4 - len(each) % 4)
-    groups[adler32][seqid] = eachdata.decode('base64')
+    try:
+        groups[adler32][seqid] = eachdata.decode('base64')
+    except:
+        print eachdata
 
 for adler32 in groups:
     dataset = groups[adler32]
@@ -56,6 +59,8 @@ for adler32 in groups:
         
         if compressed:
             product = zlib.decompress(data)
+        else:
+            product = data
         
         print product
 
