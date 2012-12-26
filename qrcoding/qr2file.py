@@ -35,7 +35,7 @@ for each in lines:
     seqid = int('0x' + each[6:8],16)
     if not groups.has_key(adler32):
         groups[adler32] = {}
-    eachdata = each[8:] + '=' * (len(each) % 4)
+    eachdata = each[8:] + '=' * (4 - len(each) % 4)
     groups[adler32][seqid] = eachdata.decode('base64')
 
 for adler32 in groups:
