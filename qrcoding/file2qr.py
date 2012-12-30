@@ -62,7 +62,9 @@ imagescount = len(qrimages)
 maxsize = int(maxsize * 1.2)
 
 colmax = max(1,
-             min(math.sqrt( imagescount ),math.floor(MAXWIDTH * 1.0 / maxsize / SCALERATIO )))
+             min(math.ceil(math.sqrt(imagescount)),
+                 math.floor(MAXWIDTH * 1.0 / maxsize / SCALERATIO ))
+             )
 rowmax = math.ceil(imagescount * 1.0 / colmax)
 margin = int(0.1 * maxsize)
 
@@ -70,14 +72,16 @@ product = Image.new('L',(maxsize * colmax, maxsize * rowmax),255)
 
 rowid, colid = 1, 1
 
+pastedcount = 0
 for qrsize, qrimg in qrimages:
     product.paste(qrimg,( margin + (colid - 1) * maxsize, margin + (rowid - 1) * maxsize))
     colid += 1
+    pastedcount += 1
     if colid > colmax:
         colid = 1
         rowid += 1
 
-print "Generated %d pieces, spread in %d x %d." % (imagescount, rowmax, colmax)
+print "Generated %d pieces, spread %d pieces in %d x %d." % (imagescount, pastedcount, rowmax, colmax)
 
 product.save('product.gif','GIF')
 product.show()
